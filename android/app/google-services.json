@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "674224858702",
+    "project_id": "thozha-9574a",
+    "storage_bucket": "thozha-9574a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:674224858702:android:53bf6b0dee88533e9a851f",
+        "android_client_info": {
+          "package_name": "com.seventhsense.thozha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSTTvZYxX_PfF4XfKUcDpf2w5qwwh3R04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
