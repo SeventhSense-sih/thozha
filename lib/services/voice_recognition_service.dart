@@ -3,46 +3,42 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class VoiceRecognitionService {
   final stt.SpeechToText _speech = stt.SpeechToText();
-  bool _isAvailable = false;
+  bool _isListening = false;
 
-  Future<void> initialize() async {
-    _isAvailable = await _speech.initialize(
+  Future<void> startListening(Function(String) onKeywordDetected) async {
+    bool available = await _speech.initialize(
       onStatus: (val) => print('onStatus: $val'),
       onError: (val) => print('onError: $val'),
     );
 
-    if (!_isAvailable) {
-      print("Speech recognition not available.");
-    } else {
-      print("Speech recognition initialized successfully.");
+    if (available) {
+      _isListening = true;
+      _listen(onKeywordDetected);
     }
   }
 
-  Future<void> startListening(Function(String) onKeywordDetected) async {
-    if (!_isAvailable) {
-      await initialize();
-    }
-
-    if (_isAvailable) {
-      _speech.listen(
-        onResult: (val) {
-          if (val.recognizedWords.contains("danger")) {
-            onKeywordDetected(val.recognizedWords);
-          }
-        },
-        listenFor:
-            Duration(seconds: 30), // Listens for 30 seconds, renews on silence
-        pauseFor: Duration(
-            seconds: 100), // Pauses for 5 seconds after no sound, then resumes
-        partialResults: true, // Continue to get partial results
-        cancelOnError: false, // Don't cancel on error, continue listening
-        onSoundLevelChange: (level) => print("Sound level: $level"),
-        listenMode: stt.ListenMode.dictation, // Continuous dictation mode
-      );
-    }
+  void _listen(Function(String) onKeywordDetected) {
+    _speech.listen(
+      onResult: (val) {
+        if (val.recognizedWords.contains("danger")) {
+          onKeywordDetected(val.recognizedWords);
+          stopListening();
+        }
+      },
+      listenFor: Duration(minutes: 5),
+      pauseFor: Duration(seconds: 5),
+      listenOptions:
+          stt.SpeechListenOptions(cancelOnError: false, partialResults: true),
+      // listenMode: stt.ListenMode.confirmation,  // Remove if deprecated
+    );
   }
 
   void stopListening() {
-    _speech.stop();
+    if (_isListening) {
+      _speech.stop();
+      _isListening = false;
+    }
   }
+
+  bool get isListening => _isListening;
 }

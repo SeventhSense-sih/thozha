@@ -1,20 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:thozha/services/sensor_service.dart';
-import 'package:thozha/services/voice_recognition_service.dart';
+// import 'package:thozha/services/sensor_service.dart';
+import 'package:thozha/services//voice_recognition_service.dart';
 import 'package:thozha/services/notification_service.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-Future<void> requestMicrophonePermission() async {
-  var status = await Permission.microphone.status;
-  if (!status.isGranted) {
-    status = await Permission.microphone.request();
-    if (status.isGranted) {
-      print("Microphone permission granted.");
-    } else {
-      print("Microphone permission denied.");
-    }
-  }
-}
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -23,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _currentMode = "Off"; // Initial mode is "Off"
-  SensorService sensorService = SensorService();
+  // SensorService sensorService = SensorService();
   VoiceRecognitionService voiceService = VoiceRecognitionService();
   NotificationService notificationService = NotificationService();
 
@@ -41,34 +28,29 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (mode) {
       case "Off":
         // Stop monitoring
-        sensorService.disconnectFromDevice();
+        //.disconnectFromDevice();
         voiceService.stopListening();
         print("Monitoring turned off.");
         break;
       case "Low":
         // Start low-level monitoring
-        requestMicrophonePermission().then((_) async {
-          if (await Permission.microphone.isGranted) {
-            await voiceService
-                .initialize(); // Ensure voice service is initialized
-            sensorService.connectToWatch();
-            voiceService.startListening((keyword) {
-              print("Code word detected: $keyword");
-              _changeMode("Medium");
-            });
-            print("Low-level monitoring activated.");
-          } else {
-            print("Microphone permission not granted.");
-          }
+        // sensorService.connectToWatch();
+        voiceService.startListening((keyword) {
+          print("Code word detected: $keyword");
+          _changeMode(
+              "Medium"); // Change to Medium mode if the code word is detected
         });
+        print("Low-level monitoring activated.");
         break;
       case "Medium":
-        // Send alerts, start recording, etc.
+        // Stop listening and take action
+        voiceService.stopListening();
         notificationService.sendAlert("Medium Alert: User needs help!");
         print("Medium mode activated. Sending alerts and monitoring.");
         break;
       case "High":
-        // Frequent alerts, alarm triggers, etc.
+        // Stop listening and take high action
+        voiceService.stopListening();
         notificationService
             .sendAlert("High Alert: Immediate assistance needed!");
         print("High mode activated. Immediate alerts and alarms.");
