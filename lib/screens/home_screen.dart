@@ -1,12 +1,6 @@
-// home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:url_launcher/url_launcher.dart';
-import '../models/contact_model.dart';
-import '../services/voice_recognition_service.dart';
-import '../services/notification_service.dart';
-import 'settings_screen.dart';
+import 'package:thozha/services//voice_recognition_service.dart';
+import 'package:thozha/services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -14,50 +8,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _currentMode = "Off";
+  String _currentMode = "Off"; // Initial mode is "Off"
+  // SensorService sensorService = SensorService();
   VoiceRecognitionService voiceService = VoiceRecognitionService();
   NotificationService notificationService = NotificationService();
-  List<ContactModel> _contacts = [];
 
   @override
   void initState() {
     super.initState();
-    notificationService.initialize();
-    _loadContacts();
-  }
-
-  Future<void> _loadContacts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final contactsString = prefs.getString('contacts') ?? '[]';
-    final List<dynamic> contactList = json.decode(contactsString);
-    setState(() {
-      _contacts = contactList
-          .map((contact) => ContactModel(
-                name: contact['name'],
-                phoneNumber: contact['phoneNumber'],
-              ))
-          .toList();
-    });
-  }
-
-  Future<void> _sendAlertToContacts() async {
-    final alertMessage =
-        "Alert! The user is in danger and needs immediate help.";
-
-    for (var contact in _contacts) {
-      final Uri smsUri = Uri(
-        scheme: 'sms',
-        path: contact.phoneNumber,
-        query: 'body=$alertMessage',
-      );
-
-      if (await canLaunchUrl(smsUri)) {
-        await launchUrl(smsUri);
-      } else {
-        print(
-            'Could not send SMS to ${contact.name} at ${contact.phoneNumber}');
-      }
-    }
+    notificationService.initialize(); // Initialize notifications
   }
 
   void _changeMode(String mode) {
@@ -67,23 +26,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
     switch (mode) {
       case "Off":
+        // Stop monitoring
+        //.disconnectFromDevice();
         voiceService.stopListening();
         print("Monitoring turned off.");
         break;
       case "Low":
+        // Start low-level monitoring
+        // sensorService.connectToWatch();
         voiceService.startListening((keyword) {
           print("Code word detected: $keyword");
-          _changeMode("Medium");
+          _changeMode(
+              "Medium"); // Change to Medium mode if the code word is detected
         });
         print("Low-level monitoring activated.");
         break;
       case "Medium":
+        // Stop listening and take action
         voiceService.stopListening();
-        _sendAlertToContacts(); // Send SMS alerts to contacts
         notificationService.sendAlert("Medium Alert: User needs help!");
         print("Medium mode activated. Sending alerts and monitoring.");
         break;
       case "High":
+        // Stop listening and take high action
         voiceService.stopListening();
         notificationService
             .sendAlert("High Alert: Immediate assistance needed!");
@@ -103,12 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              Navigator.of(context)
-                  .push(
-                      MaterialPageRoute(builder: (context) => SettingsScreen()))
-                  .then((_) {
-                _loadContacts(); // Reload contacts when returning from settings
-              });
+              // Navigate to settings screen if needed
+              print("Navigating to settings.");
             },
           ),
         ],
