@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_screen.dart'; // Import the ProfileScreen for viewing/editing profile
-import 'login_screen.dart'; // Import the LoginScreen for logging out
+import 'login_screen.dart';
+import 'contact_screen.dart'; // Import the contacts screen// Import the LoginScreen for logging out
 
 class SettingsScreen extends StatefulWidget {
   final String currentMode;
@@ -114,9 +115,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(height: 20), // Space between buttons
             ElevatedButton(
               onPressed: () {
-                // Implement add contact functionality here
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ContactsScreen()),
+                );
               },
-              child: Text('Add Emergency Contact'),
+              child: Text('Manage Emergency Contacts'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue,

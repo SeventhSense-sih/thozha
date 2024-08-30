@@ -97,9 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Positioned(
-            bottom: 60, // Positioned above the panic button
-            left: 10,
-            right: 10,
+            bottom: 90, // Positioned above the panic button
+            left: 28,
+            right: 0,
             child: _currentLocation != null
                 ? Text(
                     'Location: Lat: ${_currentLocation!.latitude}, Lon: ${_currentLocation!.longitude}',

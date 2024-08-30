@@ -70,6 +70,38 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Function to handle password reset
+  Future<void> _resetPassword() async {
+    if (_emailController.text.isEmpty) {
+      _showMessage('Please enter your email address.');
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: _emailController.text);
+      _showMessage('Password reset link sent! Check your email.');
+    } catch (e) {
+      print(e); // Handle password reset errors
+      _showMessage('An error occurred while trying to reset password.');
+    }
+  }
+
+  // Function to show messages in a dialog
+  void _showMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,13 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              SignupScreen()), // Navigate to sign-up screen
-                    );
-                  },
+                  onPressed: _resetPassword, // Call reset password function
                   child: Text('Forgot Password?'),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
