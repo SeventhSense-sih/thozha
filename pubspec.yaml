@@ -40,5 +40,5 @@ dev_dependencies:
 flutter:
   assets:
     - assets/google_logo.png
-    - assets/background-img.png
+    - assets/background_img.png
     - assets/app_logo.png

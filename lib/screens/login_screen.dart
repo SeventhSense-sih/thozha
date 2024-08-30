@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart'; // Assuming you have a home screen
-import 'user_info_screen.dart'; // Import UserInfoScreen
+import 'signup_screen.dart'; // Import the sign-up screen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -18,23 +17,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithEmailPassword() async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      _checkUserInformation(userCredential.user!);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'wrong-password') {
-        _showMessage('The password is incorrect. Please try again.');
-      } else if (e.code == 'user-not-found') {
-        _showMessage(
-            'No user found for this email. Please check and try again.');
-      } else {
-        _showMessage('An error occurred. Please try again.');
-      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
     } catch (e) {
-      print(e); // Handle any other unexpected errors
-      _showMessage('An unexpected error occurred. Please try again.');
+      print(e); // Handle login errors
     }
   }
 
@@ -48,62 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
-        _checkUserInformation(userCredential.user!);
+        await _auth.signInWithCredential(credential);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
       }
     } catch (e) {
       print(e); // Handle Google sign-in errors
     }
-  }
-
-  Future<void> _checkUserInformation(User user) async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
-
-    if (!userDoc.exists) {
-      // Navigate to user information screen if no information is found
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => UserInfoScreen()),
-      );
-    } else {
-      // If user info exists, navigate to the home screen
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
-    }
-  }
-
-  Future<void> _resetPassword() async {
-    if (_emailController.text.isEmpty) {
-      _showMessage('Please enter your email address.');
-      return;
-    }
-
-    try {
-      await _auth.sendPasswordResetEmail(email: _emailController.text);
-      _showMessage('Password reset link sent! Check your email.');
-    } catch (e) {
-      print(e); // Handle password reset errors
-      _showMessage('An error occurred while trying to reset password.');
-    }
-  }
-
-  void _showMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -190,17 +133,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 10),
                 TextButton(
-                  onPressed: _resetPassword,
-                  child: Text('Forgot Password?'),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              SignupScreen()), // Navigate to sign-up screen
+                    );
+                  },
+                  child: Text('Don\'t have an account? Sign up'),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
                   ),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/signup');
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              SignupScreen()), // Navigate to sign-up screen
+                    );
                   },
-                  child: Text('Don\'t have an account? Sign up'),
+                  child: Text('Forgot Password?'),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
                   ),

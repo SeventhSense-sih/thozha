@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
-import 'home_screen.dart'; // Assuming you have a home screen
+import 'user_info_screen.dart'; // Screen to enter additional details
+import 'login_screen.dart'; // For navigating back to login screen if needed
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -15,60 +12,55 @@ class _SignupScreenState extends State<SignupScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  String? _gender;
-  bool _physicallyChallenged = false;
-  File? _profileImage;
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
+  // Function to sign up with email and password
+  Future<void> _signUpWithEmailPassword() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      _showMessage('Please fill in all fields.');
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showMessage('Passwords do not match.');
+      return;
+    }
+
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+            builder: (context) =>
+                UserInfoScreen()), // Navigate to details screen
+      );
+    } catch (e) {
+      print(e); // Handle sign-up errors
+      _showMessage('Sign-up failed. Please try again.');
     }
   }
 
-  Future<void> _signUp() async {
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      User? user = userCredential.user;
-      if (user != null) {
-        String? imageUrl;
-        if (_profileImage != null) {
-          final storageRef = FirebaseStorage.instance
-              .ref()
-              .child('profile_pictures')
-              .child('${user.uid}.jpg');
-          await storageRef.putFile(_profileImage!);
-          imageUrl = await storageRef.getDownloadURL();
-        }
-
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'email': user.email,
-          'name': _nameController.text,
-          'phone': _phoneController.text,
-          'age': int.parse(_ageController.text),
-          'gender': _gender,
-          'physicallyChallenged': _physicallyChallenged,
-          'profilePicture': imageUrl, // Save profile picture URL
-        });
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      }
-    } catch (e) {
-      print(e); // Handle signup errors
-    }
+  // Function to display messages
+  void _showMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -77,26 +69,8 @@ class _SignupScreenState extends State<SignupScreen> {
       appBar: AppBar(title: Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: <Widget>[
-            GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: _profileImage != null
-                    ? FileImage(_profileImage!)
-                    : AssetImage(
-                        'assets/default_profile.png'), // Default image path
-                child: _profileImage == null
-                    ? Icon(Icons.camera_alt, size: 50)
-                    : null,
-              ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
-            ),
+        child: Column(
+          children: [
             TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
@@ -107,43 +81,22 @@ class _SignupScreenState extends State<SignupScreen> {
               obscureText: true,
             ),
             TextField(
-              controller: _phoneController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
-              keyboardType: TextInputType.phone,
-            ),
-            TextField(
-              controller: _ageController,
-              decoration: InputDecoration(labelText: 'Age'),
-              keyboardType: TextInputType.number,
-            ),
-            DropdownButtonFormField<String>(
-              value: _gender,
-              items: ['Male', 'Female'].map((gender) {
-                return DropdownMenuItem<String>(
-                  value: gender,
-                  child: Text(gender),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _gender = value;
-                });
-              },
-              decoration: InputDecoration(labelText: 'Gender'),
-            ),
-            SwitchListTile(
-              title: Text('Physically Challenged'),
-              value: _physicallyChallenged,
-              onChanged: (value) {
-                setState(() {
-                  _physicallyChallenged = value;
-                });
-              },
+              controller: _confirmPasswordController,
+              decoration: InputDecoration(labelText: 'Confirm Password'),
+              obscureText: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _signUp,
+              onPressed: _signUpWithEmailPassword, // Trigger sign-up process
               child: Text('Sign Up'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Text('Already have an account? Login'),
             ),
           ],
         ),
