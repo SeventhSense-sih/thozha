@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart'; // Assuming you have a home screen
 import 'signup_screen.dart'; // Import the sign-up screen
+import 'user_info_screen.dart'; // Import the details screen for first-time users
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -17,13 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithEmailPassword() async {
     try {
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      _checkUserDetails(userCredential.user);
     } catch (e) {
       print(e); // Handle login errors
     }
@@ -39,13 +39,34 @@ class _LoginScreenState extends State<LoginScreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        await _auth.signInWithCredential(credential);
+        UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+        _checkUserDetails(userCredential.user);
+      }
+    } catch (e) {
+      print(e); // Handle Google sign-in errors
+    }
+  }
+
+  // Function to check if user details are stored in Firestore
+  Future<void> _checkUserDetails(User? user) async {
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        // If the user details do not exist, navigate to the details screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => UserInfoScreen()),
+        );
+      } else {
+        // If details exist, navigate directly to the home screen
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
-    } catch (e) {
-      print(e); // Handle Google sign-in errors
     }
   }
 
