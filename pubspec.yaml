@@ -23,6 +23,9 @@ dependencies:
   permission_handler: 11.3.1
   shared_preferences: 2.3.2
   url_launcher: 6.3.0
+  location: ^7.0.0
+  geolocator: ^12.0.0
+
 
 # Add any other dependencies you need for your project here
 

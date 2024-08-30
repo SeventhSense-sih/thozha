@@ -1,5 +1,7 @@
+// home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:thozha/services//voice_recognition_service.dart';
+import 'package:location/location.dart';
+import 'package:thozha/services/voice_recognition_service.dart';
 import 'package:thozha/services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,54 +10,81 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _currentMode = "Off"; // Initial mode is "Off"
-  // SensorService sensorService = SensorService();
   VoiceRecognitionService voiceService = VoiceRecognitionService();
   NotificationService notificationService = NotificationService();
+
+  Location _location = Location();
+  LocationData? _currentLocation;
+  String _currentMode = "Off"; // To display the current mode on the screen
 
   @override
   void initState() {
     super.initState();
-    notificationService.initialize(); // Initialize notifications
+    notificationService.initialize();
+    _getLocation();
   }
 
-  void _changeMode(String mode) {
+  Future<void> _getLocation() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await _location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await _location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await _location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _currentLocation = await _location.getLocation();
+    setState(() {}); // Refresh the UI once location is fetched
+  }
+
+  Future<void> _changeMode(String mode) async {
     setState(() {
-      _currentMode = mode;
+      _currentMode = mode; // Update mode display
     });
 
     switch (mode) {
       case "Off":
-        // Stop monitoring
-        //.disconnectFromDevice();
         voiceService.stopListening();
-        print("Monitoring turned off.");
         break;
       case "Low":
-        // Start low-level monitoring
-        // sensorService.connectToWatch();
         voiceService.startListening((keyword) {
           print("Code word detected: $keyword");
-          _changeMode(
-              "Medium"); // Change to Medium mode if the code word is detected
+          _changeMode("Medium");
         });
-        print("Low-level monitoring activated.");
         break;
       case "Medium":
-        // Stop listening and take action
         voiceService.stopListening();
         notificationService.sendAlert("Medium Alert: User needs help!");
-        print("Medium mode activated. Sending alerts and monitoring.");
         break;
       case "High":
-        // Stop listening and take high action
         voiceService.stopListening();
         notificationService
             .sendAlert("High Alert: Immediate assistance needed!");
-        print("High mode activated. Immediate alerts and alarms.");
         break;
-      default:
-        break;
+    }
+  }
+
+  Widget _locationButton() {
+    if (_currentLocation != null) {
+      return ElevatedButton(
+        onPressed: () {}, // Define an appropriate action for location button
+        child: Text(
+            'Location: Lat: ${_currentLocation!.latitude}, Lon: ${_currentLocation!.longitude}'),
+      );
+    } else {
+      return SizedBox
+          .shrink(); // Render an empty box if location is not available
     }
   }
 
@@ -64,25 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Thozha - Home'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to settings screen if needed
-              print("Navigating to settings.");
-            },
-          ),
-        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Current Mode: $_currentMode',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
+          children: <Widget>[
+            Text('Current Mode: $_currentMode', style: TextStyle(fontSize: 24)),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _changeMode("Off"),
@@ -100,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => _changeMode("High"),
               child: Text('Activate High Mode'),
             ),
+            _locationButton(),
           ],
         ),
       ),

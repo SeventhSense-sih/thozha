@@ -1,5 +1,7 @@
+// lib/services/notification_service.dart
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -10,11 +12,7 @@ class NotificationService {
     // Request permissions for iOS
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
-      announcement: false,
       badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
       sound: true,
     );
 
@@ -23,17 +21,14 @@ class NotificationService {
     // Initialize local notifications
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
     );
 
-    // Updated initialization method to use the new API
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        // Handle notification tap
         if (response.payload != null) {
           print('Notification payload: ${response.payload}');
           // Handle the payload action
@@ -54,14 +49,25 @@ class NotificationService {
   static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     print('Handling a background message: ${message.messageId}');
-    // You can perform background tasks here if needed
   }
 
   Future<void> sendAlert(String message) async {
-    // Logic to send a notification or update via Firebase Cloud Functions
-    // You can send a message to a specific topic or user
-    print('Sending alert: $message');
-    // For example, you might trigger a Firebase function that sends a notification
+    // Here, we simulate sending an alert by saving it to Firestore.
+    // You could also use Firebase Functions to send push notifications directly.
+
+    // Example: Save alert details to Firestore
+    try {
+      CollectionReference alerts =
+          FirebaseFirestore.instance.collection('alerts');
+      await alerts.add({
+        'message': message,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      print('Alert sent: $message');
+    } catch (e) {
+      print('Failed to send alert: $e');
+    }
   }
 
   Future<void> _showLocalNotification(RemoteMessage message) async {
@@ -72,7 +78,6 @@ class NotificationService {
       channelDescription: 'your_channel_description',
       importance: Importance.high,
       priority: Priority.high,
-      showWhen: true,
     );
 
     const NotificationDetails platformChannelSpecifics =
