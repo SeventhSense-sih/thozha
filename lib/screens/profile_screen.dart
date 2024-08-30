@@ -79,6 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
         }
 
+        // Update user information in Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -110,6 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           key: _formKey,
           child: ListView(
             children: <Widget>[
+              // Display profile picture
               Center(
                 child: GestureDetector(
                   onTap: _pickImage,

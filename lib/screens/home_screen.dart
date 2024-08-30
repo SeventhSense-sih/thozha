@@ -111,8 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
           ),
           Positioned(
-            bottom: 15,
-            left: 5,
+            bottom: 10,
+            left: 0,
             right: 0,
             child: Center(
               child: ElevatedButton(
