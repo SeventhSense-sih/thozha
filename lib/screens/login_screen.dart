@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart'; // Assuming you have a home screen
+import 'user_info_screen.dart'; // Import UserInfoScreen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -16,15 +18,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithEmailPassword() async {
     try {
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      _checkUserInformation(userCredential.user!);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        _showMessage('The password is incorrect. Please try again.');
+      } else if (e.code == 'user-not-found') {
+        _showMessage(
+            'No user found for this email. Please check and try again.');
+      } else {
+        _showMessage('An error occurred. Please try again.');
+      }
     } catch (e) {
-      print(e); // Handle login errors
+      print(e); // Handle any other unexpected errors
+      _showMessage('An unexpected error occurred. Please try again.');
     }
   }
 
@@ -38,13 +48,31 @@ class _LoginScreenState extends State<LoginScreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        await _auth.signInWithCredential(credential);
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+        UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+        _checkUserInformation(userCredential.user!);
       }
     } catch (e) {
       print(e); // Handle Google sign-in errors
+    }
+  }
+
+  Future<void> _checkUserInformation(User user) async {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (!userDoc.exists) {
+      // Navigate to user information screen if no information is found
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => UserInfoScreen()),
+      );
+    } else {
+      // If user info exists, navigate to the home screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
     }
   }
 
