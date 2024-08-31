@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:thozha/screens/panic_screen.dart';
 
 class NotificationsScreen extends StatelessWidget {
   final CollectionReference alertsCollection =
@@ -11,19 +12,42 @@ class NotificationsScreen extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           title: Text('Alert Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Message: ${alert['message']}'),
-              Text('Latitude: ${alert['latitude']}'),
-              Text('Longitude: ${alert['longitude']}'),
-              ElevatedButton(
-                onPressed: () {
-                  // Implement action to open Google Maps or show in-app
-                },
-                child: Text('Open Location in Maps'),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Display profile picture
+                if (alert['userProfilePic'] != null) ...[
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(alert['userProfilePic']),
+                    radius: 40,
+                  ),
+                  SizedBox(height: 10),
+                ],
+                Text('Name: ${alert['userName']}'),
+                Text('Age: ${alert['userAge']}'),
+                Text('Gender: ${alert['userGender']}'),
+                Text('Phone: ${alert['userPhone']}'),
+                SizedBox(height: 10),
+                Text('Message: ${alert['message']}'),
+                Text('Latitude: ${alert['latitude']}'),
+                Text('Longitude: ${alert['longitude']}'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate to the PanicScreen and pass the coordinates
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PanicScreen(
+                          latitude: alert['latitude'],
+                          longitude: alert['longitude'],
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Track Location'),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(

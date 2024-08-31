@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:thozha/screens/notification_screen.dart'; // Import the NotificationsScreen
+import 'package:flutter/material.dart';
+
+import '../main.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -14,7 +19,17 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload == 'navigateToNotificationsScreen') {
+          ThozhaApp.navigatorKey.currentState!.push(
+            MaterialPageRoute(builder: (context) => NotificationsScreen()),
+          );
+        }
+      },
+    );
 
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
@@ -41,14 +56,15 @@ class NotificationService {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('Notification opened with data: ${message.data}');
+      ThozhaApp.navigatorKey.currentState!.push(
+        MaterialPageRoute(builder: (context) => NotificationsScreen()),
+      );
     });
 
-    // Listen to Firestore for new alerts
     alertsCollection.snapshots().listen((snapshot) {
       for (var change in snapshot.docChanges) {
         if (change.type == DocumentChangeType.added) {
-          var alertData = change.doc.data()
-              as Map<String, dynamic>?; // Cast to Map<String, dynamic>
+          var alertData = change.doc.data() as Map<String, dynamic>?;
           if (alertData != null) {
             _showLocalNotification(alertData['message'], 'New Alert');
           }
@@ -60,13 +76,33 @@ class NotificationService {
   Future<void> sendAlert(
       String message, double? latitude, double? longitude) async {
     try {
+      // Fetch user details from the user's collection
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      Map<String, dynamic> userDetails = userDoc.data() as Map<String, dynamic>;
+
+      // Save alert to Firestore with user details
       await alertsCollection.add({
         'message': message,
         'latitude': latitude,
         'longitude': longitude,
         'timestamp': FieldValue.serverTimestamp(),
+        'userId': currentUser.uid, // Save user ID for reference
+        'userName': userDetails['name'],
+        'userAge': userDetails['age'],
+        'userGender': userDetails['gender'],
+        'userPhone': userDetails['phone'],
+        'userProfilePic': userDetails[
+            'profilePicture'], // Assuming this field stores the URL of the profile picture
       });
-      print('Alert saved to Firestore.');
+
+      print('Alert saved to Firestore with user details.');
     } catch (e) {
       print('Failed to send alert: $e');
     }
@@ -89,6 +125,8 @@ class NotificationService {
       title,
       body,
       platformChannelSpecifics,
+      payload:
+          'navigateToNotificationsScreen', // Use payload to indicate navigation
     );
   }
 }

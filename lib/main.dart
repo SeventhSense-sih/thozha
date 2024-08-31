@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'screens/splash_screen.dart'; // Import SplashScreen
+import 'screens/notification_screen.dart'; // Import the NotificationsScreen
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // Create an instance of FlutterLocalNotificationsPlugin
@@ -31,6 +32,8 @@ void _showLocalNotification(String? title, String? body) {
     title,
     body,
     platformChannelSpecifics,
+    payload:
+        'navigateToNotificationsScreen', // Use payload to indicate navigation
   );
 }
 
@@ -44,7 +47,16 @@ void main() async {
   const InitializationSettings initializationSettings =
       InitializationSettings(android: initializationSettingsAndroid);
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      if (response.payload == 'navigateToNotificationsScreen') {
+        ThozhaApp.navigatorKey.currentState!.push(
+          MaterialPageRoute(builder: (context) => NotificationsScreen()),
+        );
+      }
+    },
+  );
 
   await initializeFirebaseMessaging();
 
@@ -52,6 +64,9 @@ void main() async {
 }
 
 class ThozhaApp extends StatelessWidget {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -60,6 +75,7 @@ class ThozhaApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: SplashScreen(), // Set SplashScreen as the initial screen
+      navigatorKey: navigatorKey, // Add a navigator key for navigation
     );
   }
 }
@@ -97,5 +113,9 @@ Future<void> initializeFirebaseMessaging() async {
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     print('Notification opened with data: ${message.data}');
+    // Navigate to NotificationsScreen when a notification is tapped
+    ThozhaApp.navigatorKey.currentState!.push(
+      MaterialPageRoute(builder: (context) => NotificationsScreen()),
+    );
   });
 }
