@@ -4,7 +4,6 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'
-
 }
 
 dependencies {
@@ -28,11 +27,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.seventhsense.thozha"
+        applicationId = "com.seventhsense.thozha" // Ensure this matches google-services.json
         minSdk = 23 // Set minSdk version explicitly
         targetSdk = 34 // Set targetSdk version explicitly
-        versionCode = 1 // Set versionCode explicitly
-        versionName = "1.0" // Set versionName explicitly
+        versionCode 1 // Set versionCode explicitly
+        versionName "1.0" // Set versionName explicitly
     }
 
     buildTypes {

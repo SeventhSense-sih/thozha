@@ -1,119 +1,87 @@
-// lib/services/notification_service.dart
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'contact_service.dart';
-import '../models/contact_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  final ContactService contactService = ContactService();
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('users');
 
   Future<void> initialize() async {
-    // Request permissions for iOS
+    // Request permission for notifications
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
 
-    print('User granted permission: ${settings.authorizationStatus}');
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+    } else {
+      print('User declined or has not accepted permission');
+    }
 
-    // Initialize local notifications
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        if (response.payload != null) {
-          print('Notification payload: ${response.payload}');
-          // Handle the payload action
-        }
-      },
-    );
-
-    // Listen to messages when the app is in the foreground
+    // Configure foreground notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received a foreground message: ${message.messageId}');
-      _showLocalNotification(message);
+      print('Message received in foreground: ${message.notification?.body}');
     });
-
-    // Handle background messages
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  }
-
-  static Future<void> _firebaseMessagingBackgroundHandler(
-      RemoteMessage message) async {
-    print('Handling a background message: ${message.messageId}');
   }
 
   Future<void> sendAlert(
       String message, double? latitude, double? longitude) async {
-    // Save alert details with location to Firestore
     try {
-      CollectionReference alerts =
-          FirebaseFirestore.instance.collection('alerts');
-      await alerts.add({
+      // Save alert to Firestore for further processing and use
+      await FirebaseFirestore.instance.collection('alerts').add({
         'message': message,
         'latitude': latitude,
         'longitude': longitude,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      print('Alert sent: $message with location: ($latitude, $longitude)');
-
-      // Fetch emergency contacts
-      List<ContactModel> contacts = await contactService.loadContacts();
-      for (ContactModel contact in contacts) {
-        await _sendSms(contact.phoneNumber, message, latitude, longitude);
+      // Fetch users within a 2 km radius
+      QuerySnapshot querySnapshot = await usersCollection.get();
+      for (var doc in querySnapshot.docs) {
+        // Check if 'location' field exists
+        if (doc.exists && doc['location'] != null) {
+          GeoPoint userLocation = doc['location'];
+          if (_isNearby(latitude, longitude, userLocation.latitude,
+              userLocation.longitude)) {
+            _sendNotificationToUser(doc.id, message);
+          }
+        } else {
+          print('Location data not available for user: ${doc.id}');
+        }
       }
+
+      print('Alert sent successfully to nearby users.');
     } catch (e) {
       print('Failed to send alert: $e');
     }
   }
 
-  Future<void> _sendSms(String phoneNumber, String message, double? latitude,
-      double? longitude) async {
-    String smsMessage =
-        '$message\nLocation: https://www.google.com/maps?q=$latitude,$longitude';
-    String url = 'sms:$phoneNumber?body=${Uri.encodeComponent(smsMessage)}';
-
-    // Use canLaunchUrl instead of canLaunch
-    if (await canLaunchUrl(Uri.parse(url))) {
-      // Use launchUrl instead of launch
-      await launchUrl(Uri.parse(url));
-    } else {
-      print('Could not launch $url');
-    }
+  bool _isNearby(double? lat1, double? lon1, double lat2, double lon2) {
+    // Simple distance calculation to check if the user is within 2 km
+    const double distanceThreshold = 2.0; // km
+    double distance = _calculateDistance(lat1, lon1, lat2, lon2);
+    return distance <= distanceThreshold;
   }
 
-  Future<void> _showLocalNotification(RemoteMessage message) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: 'your_channel_description',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
+  double _calculateDistance(
+      double? lat1, double? lon1, double lat2, double lon2) {
+    // Implement a simple formula to calculate distance between two lat/lon points
+    // For simplicity, you can use the Haversine formula or similar
+    // This is a placeholder function
+    return 1.0; // Replace with actual distance calculation
+  }
 
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      message.notification?.title,
-      message.notification?.body,
-      platformChannelSpecifics,
-      payload: message.data['payload'],
+  void _sendNotificationToUser(String userId, String message) {
+    _firebaseMessaging.subscribeToTopic(userId);
+    // Send notification via FCM
+    _firebaseMessaging.sendMessage(
+      to: '/topics/$userId',
+      data: {
+        'title': 'Thozha Alert',
+        'body': message,
+      },
     );
   }
 }
