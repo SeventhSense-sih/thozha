@@ -29,6 +29,8 @@ dependencies:
   firebase_storage: ^12.2.0
   maps_launcher: ^2.2.1
   google_maps_flutter: 2.9.0
+  googleapis_auth: 1.6.0
+  http: 1.2.1
 
 # Add any other dependencies you need for your project here
 

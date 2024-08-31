@@ -5,6 +5,7 @@ import 'package:thozha/services/voice_recognition_service.dart';
 import 'package:thozha/services/notification_service.dart';
 import 'package:thozha/screens/settings_screen.dart';
 import 'package:thozha/screens/notification_screen.dart'; // Import the NotificationsScreen
+//import 'package:thozha/screens/location_map_screen.dart'; // Import the LocationMapScreen
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -108,6 +109,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Thozha - Home'),
         actions: [
+          IconButton(
+            icon: Icon(Icons.map),
+            onPressed: () {
+              // Navigate to the LocationMapScreen
+              // Navigator.of(context).push(
+              // MaterialPageRoute(builder: (context) => LocationMapScreen()),
+              // );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.notifications),
             onPressed: () {

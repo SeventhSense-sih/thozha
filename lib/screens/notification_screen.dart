@@ -5,6 +5,37 @@ class NotificationsScreen extends StatelessWidget {
   final CollectionReference alertsCollection =
       FirebaseFirestore.instance.collection('alerts');
 
+  void _showAlertDetails(BuildContext context, DocumentSnapshot alert) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Alert Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Message: ${alert['message']}'),
+              Text('Latitude: ${alert['latitude']}'),
+              Text('Longitude: ${alert['longitude']}'),
+              ElevatedButton(
+                onPressed: () {
+                  // Implement action to open Google Maps or show in-app
+                },
+                child: Text('Open Location in Maps'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +61,7 @@ class NotificationsScreen extends StatelessWidget {
                 title: Text(alert['message']),
                 subtitle: Text(
                     'Location: ${alert['latitude']}, ${alert['longitude']}'),
+                onTap: () => _showAlertDetails(context, alert),
               );
             },
           );
