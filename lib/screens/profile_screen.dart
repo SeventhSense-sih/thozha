@@ -19,6 +19,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _physicallyChallenged = false;
   File? _profileImage;
   String? _profileImageUrl; // Store the profile image URL
+  bool _isVerified = false; // Store verification status
+  String _verificationStatus = 'pending'; // Store verification status string
 
   @override
   void initState() {
@@ -29,21 +31,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUserInfo() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      if (userDoc.exists) {
-        setState(() {
-          _nameController.text = userDoc['name'];
-          _phoneController.text = userDoc['phone'];
-          _ageController.text = userDoc['age'].toString();
-          _gender = userDoc['gender'];
-          _physicallyChallenged = userDoc['physicallyChallenged'];
-          _profileImageUrl =
-              userDoc['profilePicture']; // Get profile picture URL
-        });
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (userDoc.exists) {
+          // Update each field separately to ensure proper state update
+          setState(() {
+            _nameController.text = userDoc['name'] ?? '';
+          });
+          setState(() {
+            _phoneController.text = userDoc['phone'] ?? '';
+          });
+          setState(() {
+            _ageController.text = userDoc['age']?.toString() ?? '';
+          });
+          setState(() {
+            _gender = userDoc['gender'];
+          });
+          setState(() {
+            _physicallyChallenged = userDoc['physicallyChallenged'] ?? false;
+          });
+          setState(() {
+            _profileImageUrl = userDoc['profilePicture'];
+          });
+          setState(() {
+            _isVerified = userDoc['isVerified'] ?? false;
+          });
+          setState(() {
+            _verificationStatus = userDoc['verificationStatus'] ?? 'pending';
+          });
+
+          print('User info loaded successfully');
+        } else {
+          print('User document does not exist');
+        }
+      } catch (e) {
+        print('Error loading user info: $e');
       }
+    } else {
+      print('No user is currently logged in');
     }
   }
 
@@ -120,8 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
                         : (_profileImageUrl != null
-                            ? NetworkImage(
-                                _profileImageUrl!) // Use profile image URL from Firestore
+                            ? NetworkImage(_profileImageUrl!)
                             : AssetImage('assets/default_profile.png')
                                 as ImageProvider),
                     child: _profileImage == null && _profileImageUrl == null
@@ -130,6 +157,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: 20),
+              // Show verification status and blue tick
+              _isVerified
+                  ? Row(
+                      children: [
+                        Text('Verified User'),
+                        Icon(Icons.check_circle, color: Colors.blue),
+                      ],
+                    )
+                  : Text('Verification Status: $_verificationStatus'),
               SizedBox(height: 20),
               TextFormField(
                 controller: _nameController,
