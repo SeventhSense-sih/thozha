@@ -16,7 +16,7 @@ class NotificationsScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Display profile picture
+                // Display profile picture if available
                 if (alert['userProfilePic'] != null) ...[
                   CircleAvatar(
                     backgroundImage: NetworkImage(alert['userProfilePic']),
@@ -65,6 +65,10 @@ class NotificationsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notifications'),
+        leading: IconButton(
+          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:

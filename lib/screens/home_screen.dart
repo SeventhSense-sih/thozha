@@ -4,8 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thozha/services/voice_recognition_service.dart';
 import 'package:thozha/services/notification_service.dart';
 import 'package:thozha/screens/settings_screen.dart';
-import 'package:thozha/screens/notification_screen.dart'; // Import the NotificationsScreen
-//import 'package:thozha/screens/location_map_screen.dart'; // Import the LocationMapScreen
+import 'package:thozha/screens/notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -108,18 +107,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Thozha - Home'),
+        backgroundColor: Color(0xFFFDE8E8), // More light pink background color
         actions: [
           IconButton(
-            icon: Icon(Icons.map),
-            onPressed: () {
-              // Navigate to the LocationMapScreen
-              // Navigator.of(context).push(
-              // MaterialPageRoute(builder: (context) => LocationMapScreen()),
-              // );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications),
+            icon: Image.asset('assets/notification.png'), // Notification image
             onPressed: () {
               // Navigate to the notifications screen
               Navigator.of(context).push(
@@ -128,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Image.asset('assets/settings.png'), // Settings image
             onPressed: () {
               // Navigate to the settings screen with current mode and callback
               Navigator.of(context).push(
@@ -154,46 +145,33 @@ class _HomeScreenState extends State<HomeScreen> {
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
           ),
-          Center(
-            child: Text(
-              'Current Mode: $_currentMode',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ),
           Positioned(
-            bottom: 90, // Positioned above the panic button
-            left: 28,
-            right: 0,
-            child: _currentLocation != null
-                ? Text(
-                    'Location: Lat: ${_currentLocation!.latitude}, Lon: ${_currentLocation!.longitude}',
-                    style: TextStyle(fontSize: 16),
-                  )
-                : Text(
-                    'Location: Not Available',
-                    style: TextStyle(fontSize: 16),
-                  ),
-          ),
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: _activatePanicMode,
-                style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(20),
-                  backgroundColor: Colors.red, // Panic button color
-                ),
-                child: Text(
-                  'Panic',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+            top: 20,
+            left: 20,
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                'Current Mode: $_currentMode',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _activatePanicMode,
+        backgroundColor: Colors.red, // Panic button color
+        icon: Image.asset(
+          'assets/alert_icon.png', // Path to your custom alert icon
+          height: 24, // Adjust size as necessary
+          width: 24,
+        ),
+        label: Text('Panic'), // Button label
       ),
     );
   }

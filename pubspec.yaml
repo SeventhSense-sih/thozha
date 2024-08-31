@@ -47,3 +47,12 @@ flutter:
     - assets/google_logo.png
     - assets/background_img.png
     - assets/app_logo.png
+    - assets/add_icon.png
+    - assets/alert_icon.png
+    - assets/back_arrow.png
+    - assets/delete_icon.png
+    - assets/dropdown_icon.png
+    - assets/edit_icon.png
+    - assets/notification.png
+    - assets/settings.png
+    - assets/upload_icon.png

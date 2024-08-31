@@ -33,14 +33,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
     try {
       await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+          email: email, password: password);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (context) =>
-                UserInfoScreen()), // Navigate to details screen
-      );
+          MaterialPageRoute(builder: (context) => UserInfoScreen()));
     } catch (e) {
       print(e); // Handle sign-up errors
       _showMessage('Sign-up failed. Please try again.');
@@ -67,36 +62,76 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Sign Up')),
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image:
+                AssetImage('assets/background_image.jpg'), // Background image
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(
+                labelText: 'Email',
+                filled: true,
+                fillColor:
+                    Colors.white.withOpacity(0.8), // Translucent white fill
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
             ),
+            SizedBox(height: 10),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                filled: true,
+                fillColor:
+                    Colors.white.withOpacity(0.8), // Translucent white fill
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
               obscureText: true,
             ),
+            SizedBox(height: 10),
             TextField(
               controller: _confirmPasswordController,
-              decoration: InputDecoration(labelText: 'Confirm Password'),
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                filled: true,
+                fillColor:
+                    Colors.white.withOpacity(0.8), // Translucent white fill
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
               obscureText: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _signUpWithEmailPassword, // Trigger sign-up process
               child: Text('Sign Up'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blueAccent, // Button color
+                padding: EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               },
               child: Text('Already have an account? Login'),
+              style: TextButton.styleFrom(
+                  foregroundColor: Colors.black), // Text button style
             ),
           ],
         ),

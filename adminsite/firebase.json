@@ -1,7 +1,17 @@
 {
   "hosting": {
-    "site": "thozha-admin-auth-site",
-    "public": "adminsite"
+    "public": "adminsite",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",

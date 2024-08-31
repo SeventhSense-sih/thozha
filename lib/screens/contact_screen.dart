@@ -98,6 +98,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Emergency Contacts'),
+        backgroundColor: Colors.blueAccent, // Applied color from design one
+        leading: IconButton(
+          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: contactsCollection.snapshots(),
@@ -113,27 +118,34 @@ class _ContactsScreenState extends State<ContactsScreen> {
             itemCount: contacts.length,
             itemBuilder: (context, index) {
               final contact = contacts[index];
-              return ListTile(
-                title: Text(contact['name']),
-                subtitle:
-                    Text('${contact['relation']} - ${contact['phoneNumber']}'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () => _showContactDialog(
-                        contact.id,
-                        contact['name'],
-                        contact['relation'],
-                        contact['phoneNumber'],
+              return Card(
+                elevation: 3,
+                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                child: ListTile(
+                  title: Text(contact['name'],
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                      '${contact['relation']} - ${contact['phoneNumber']}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Image.asset(
+                            'assets/edit_icon.png'), // Custom edit icon
+                        onPressed: () => _showContactDialog(
+                          contact.id,
+                          contact['name'],
+                          contact['relation'],
+                          contact['phoneNumber'],
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () => _deleteContact(contact.id),
-                    ),
-                  ],
+                      IconButton(
+                        icon: Image.asset(
+                            'assets/delete_icon.png'), // Custom delete icon
+                        onPressed: () => _deleteContact(contact.id),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -142,7 +154,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showContactDialog(),
-        child: Icon(Icons.add),
+        child: Image.asset('assets/add_icon.png'), // Custom add contact icon
+        backgroundColor: Colors.blueAccent, // Applied color from design one
       ),
     );
   }

@@ -2,26 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Verification Dashboard</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Admin Verification Dashboard</h1>
-<div id="login-form">
+<h1>Admin Panel</h1>
+<div id="loginSection">
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <button id="loginBtn">Login</button>
 </div>
-<div id="admin-dashboard" style="display:none;">
+<div id="adminSection" style="display: none;">
     <h2>Pending Verifications</h2>
-    <div id="verification-requests"></div>
+    <div id="verificationRequests"></div>
 </div>
 
-<script>
-    // Firebase initialization
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+
     const firebaseConfig = {
         apiKey: "AIzaSyBPakaUy-eaQA7K_qMcSqJISkZotccOG5g",
         authDomain: "thozha-9574a.firebaseapp.com",
@@ -31,75 +37,70 @@
         appId: "1:674224858702:web:d1914bd91067f05a9a851f",
         measurementId: "G-P2EEG49S72"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
 
-    // Admin login logic
-    function login() {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        auth.signInWithEmailAndPassword(email, password)
-            .then(userCredential => {
-                // Check if the logged-in user is an admin
-                const userId = userCredential.user.uid;
-                db.collection('admins').doc(userId).get().then(doc => {
-                    if (doc.exists) {
-                        document.getElementById('login-form').style.display = 'none';
-                        document.getElementById('admin-dashboard').style.display = 'block';
-                        fetchPendingVerifications();
-                    } else {
-                        alert('You are not authorized to access this page.');
-                        auth.signOut();
-                    }
-                });
-            })
-            .catch(error => {
-                alert('Login failed: ' + error.message);
-            });
-    }
 
-    // Fetch and display verification requests
-    function fetchPendingVerifications() {
-        db.collection('verifications').where('status', '==', 'pending').get().then(snapshot => {
-            const container = document.getElementById('verification-requests');
-            container.innerHTML = ''; // Clear previous data
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <p>User ID: ${data.userId}</p>
-                    <p>Status: ${data.status}</p>
-                    <img src="${data.idProofUrl}" width="200" />
-                    <button onclick="approve('${doc.id}')">Approve</button>
-                    <button onclick="reject('${doc.id}')">Reject</button>
-                `;
-                container.appendChild(div);
-            });
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            const adminDocRef = doc(db, 'admins', user.uid);
+            const adminDoc = await getDoc(adminDocRef);
+
+            if (adminDoc.exists()) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+                loadVerificationRequests();
+            } else {
+                alert('You are not authorized to access this panel.');
+                auth.signOut();
+            }
+        } catch (error) {
+            alert('Error logging in: ' + error.message);
+        }
+    });
+
+    async function loadVerificationRequests() {
+        const verificationsRef = collection(db, 'verifications');
+        const querySnapshot = await getDocs(verificationsRef);
+
+        const requestsDiv = document.getElementById('verificationRequests');
+        requestsDiv.innerHTML = '';
+
+        querySnapshot.forEach(async (doc) => {
+            const userId = doc.id;
+            const userDoc = doc.data();
+            const userProfilePic = userDoc.profilePicture || 'assets/default_profile.png';
+            const verificationDocRef = ref(storage, `verification_docs/${userId}/document.jpg`);
+            const verificationUrl = await getDownloadURL(verificationDocRef);
+
+            const requestDiv = document.createElement('div');
+            requestDiv.innerHTML = `
+                <h3>${userDoc.name}</h3>
+                <p>Email: ${userDoc.email}</p>
+                <img src="${userProfilePic}" alt="Profile Picture" width="100">
+                <img src="${verificationUrl}" alt="Verification Document" width="200">
+                <button onclick="verifyUser('${userId}', true)">Approve</button>
+                <button onclick="verifyUser('${userId}', false)">Reject</button>
+            `;
+            requestsDiv.appendChild(requestDiv);
         });
     }
 
-    // Approve verification
-    function approve(docId) {
-        db.collection('verifications').doc(docId).update({ status: 'verified' });
-        db.collection('users').doc(docId).update({ isVerified: true, verificationStatus: 'verified' });
-        alert('User verified successfully.');
-        fetchPendingVerifications();
-    }
-
-    // Reject verification
-    function reject(docId) {
-        db.collection('verifications').doc(docId).update({ status: 'rejected' });
-        alert('User verification rejected.');
-        fetchPendingVerifications();
-    }
-
-    // Make a normal user an admin (use this once per user to add to admin list)
-    function makeUserAdmin(userId) {
-        db.collection('admins').doc(userId).set({ role: 'admin' })
-            .then(() => alert('User made admin successfully.'));
-    }
+    window.verifyUser = async (userId, isApproved) => {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, {
+            isVerified: isApproved
+        });
+        alert(`User verification ${isApproved ? 'approved' : 'rejected'}`);
+        loadVerificationRequests();
+    };
 </script>
 </body>
 </html>

@@ -40,29 +40,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Update each field separately to ensure proper state update
           setState(() {
             _nameController.text = userDoc['name'] ?? '';
-          });
-          setState(() {
             _phoneController.text = userDoc['phone'] ?? '';
-          });
-          setState(() {
             _ageController.text = userDoc['age']?.toString() ?? '';
-          });
-          setState(() {
             _gender = userDoc['gender'];
-          });
-          setState(() {
             _physicallyChallenged = userDoc['physicallyChallenged'] ?? false;
-          });
-          setState(() {
             _profileImageUrl = userDoc['profilePicture'];
-          });
-          setState(() {
             _isVerified = userDoc['isVerified'] ?? false;
-          });
-          setState(() {
             _verificationStatus = userDoc['verificationStatus'] ?? 'pending';
           });
-
           print('User info loaded successfully');
         } else {
           print('User document does not exist');
@@ -100,9 +85,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             imageUrl = await storageRef.getDownloadURL();
           } catch (e) {
             print('Error uploading profile picture: $e');
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Failed to upload profile picture.'),
-            ));
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to upload profile picture.')));
             return;
           }
         }
@@ -120,9 +104,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'profilePicture': imageUrl, // Update profile picture URL
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Profile updated successfully!'),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Profile updated successfully!')));
       }
     }
   }
@@ -132,6 +115,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
+        leading: IconButton(
+          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -149,8 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ? FileImage(_profileImage!)
                         : (_profileImageUrl != null
                             ? NetworkImage(_profileImageUrl!)
-                            : AssetImage('assets/default_profile.png')
-                                as ImageProvider),
+                            : AssetImage('assets/upload_icon.png')),
                     child: _profileImage == null && _profileImageUrl == null
                         ? Icon(Icons.camera_alt, size: 50)
                         : null,
@@ -161,6 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Show verification status and blue tick
               _isVerified
                   ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('Verified User'),
                         Icon(Icons.check_circle, color: Colors.blue),
@@ -170,7 +157,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 20),
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  filled: true,
+                  fillColor:
+                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -178,9 +172,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 10),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone Number'),
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  filled: true,
+                  fillColor:
+                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -189,9 +191,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 10),
               TextFormField(
                 controller: _ageController,
-                decoration: InputDecoration(labelText: 'Age'),
+                decoration: InputDecoration(
+                  labelText: 'Age',
+                  filled: true,
+                  fillColor:
+                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -200,8 +210,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: _gender,
+                icon: Image.asset(
+                    'assets/dropdown_icon.png'), // Custom dropdown icon
                 items: ['Male', 'Female'].map((gender) {
                   return DropdownMenuItem<String>(
                     value: gender,
@@ -213,7 +226,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _gender = value;
                   });
                 },
-                decoration: InputDecoration(labelText: 'Gender'),
+                decoration: InputDecoration(
+                  labelText: 'Gender',
+                  filled: true,
+                  fillColor:
+                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
                 validator: (value) {
                   if (value == null) {
                     return 'Please select your gender';
@@ -234,6 +254,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ElevatedButton(
                 onPressed: _updateUserInfo,
                 child: Text('Update Profile'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blueAccent, // Button color
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
               ),
             ],
           ),

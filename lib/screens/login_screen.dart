@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       _checkUserDetails(userCredential.user);
     } catch (e) {
-      print(e); // Handle login errors
+      _showMessage('Login failed. Please try again.');
     }
   }
 
@@ -44,49 +44,39 @@ class _LoginScreenState extends State<LoginScreen> {
         _checkUserDetails(userCredential.user);
       }
     } catch (e) {
-      print(e); // Handle Google sign-in errors
+      _showMessage('Google sign-in failed. Please try again.');
     }
   }
 
-  // Function to check if user details are stored in Firestore
   Future<void> _checkUserDetails(User? user) async {
     if (user != null) {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .get();
-
       if (!userDoc.exists) {
-        // If the user details do not exist, navigate to the details screen
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => UserInfoScreen()),
-        );
+            MaterialPageRoute(builder: (context) => UserInfoScreen()));
       } else {
-        // If details exist, navigate directly to the home screen
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+            MaterialPageRoute(builder: (context) => HomeScreen()));
       }
     }
   }
 
-  // Function to handle password reset
   Future<void> _resetPassword() async {
     if (_emailController.text.isEmpty) {
       _showMessage('Please enter your email address.');
       return;
     }
-
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text);
       _showMessage('Password reset link sent! Check your email.');
     } catch (e) {
-      print(e); // Handle password reset errors
-      _showMessage('An error occurred while trying to reset password.');
+      _showMessage('An error occurred while trying to reset the password.');
     }
   }
 
-  // Function to show messages in a dialog
   void _showMessage(String message) {
     showDialog(
       context: context,
@@ -111,9 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-                'assets/background_image.jpg'), // Use your image file here
-            fit: BoxFit.cover, // Adjust this as needed
+            image:
+                AssetImage('assets/background_image.jpg'), // Background image
+            fit: BoxFit.cover,
           ),
         ),
         child: Center(
@@ -128,10 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.8),
+                    fillColor:
+                        Colors.white.withOpacity(0.8), // Translucent white fill
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -140,10 +130,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.8),
+                    fillColor:
+                        Colors.white.withOpacity(0.8), // Translucent white fill
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   obscureText: true,
                 ),
@@ -153,11 +143,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text('Login with Email'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: Colors.blueAccent, // Button color
                     padding: EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -165,21 +154,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _signInWithGoogle,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.redAccent,
+                    backgroundColor: Colors.redAccent, // Google button color
                     padding: EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        'assets/google_logo.png', // Your Google logo path
-                        height: 24.0, // Adjust the size as needed
-                      ),
-                      SizedBox(width: 10), // Space between logo and text
+                      Image.asset('assets/google_logo.png',
+                          height: 24.0), // Google logo
+                      SizedBox(width: 10),
                       Text('Login with Google'),
                     ],
                   ),
@@ -187,23 +173,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              SignupScreen()), // Navigate to sign-up screen
-                    );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SignupScreen()));
                   },
                   child: Text('Don\'t have an account? Sign up'),
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.black,
-                  ),
+                      foregroundColor: Colors.black), // Text button style
                 ),
                 TextButton(
-                  onPressed: _resetPassword, // Call reset password function
+                  onPressed: _resetPassword,
                   child: Text('Forgot Password?'),
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.black,
-                  ),
+                      foregroundColor: Colors.black), // Text button style
                 ),
               ],
             ),
