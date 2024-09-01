@@ -44,19 +44,29 @@ class NotificationsScreen extends StatelessWidget {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => PanicScreen(
-                          latitude: alert['latitude'],
-                          longitude: alert['longitude'],
+                    final double? latitude = alert['latitude']?.toDouble();
+                    final double? longitude = alert['longitude']?.toDouble();
+                    if (latitude != null && longitude != null) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PanicScreen(
+                            victimLatitude: latitude, // Corrected parameter name
+                            victimLongitude: longitude, // Corrected parameter name
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Invalid location data. Unable to track.'),
+                        ),
+                      );
+                    }
                   },
                   child: Text('Track Location'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.pinkAccent, // Corrected background color
+                    backgroundColor: Colors.pinkAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -75,6 +85,8 @@ class NotificationsScreen extends StatelessWidget {
       },
     );
   }
+
+
 
   Widget _buildDetailRow(String label, dynamic value) {
     return Padding(
@@ -105,13 +117,12 @@ class NotificationsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Notifications'),
         leading: IconButton(
-          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          icon: Image.asset('assets/back_arrow.png'),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-        alertsCollection.orderBy('timestamp', descending: true).snapshots(),
+        stream: alertsCollection.orderBy('timestamp', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -126,8 +137,7 @@ class NotificationsScreen extends StatelessWidget {
               final alert = notifications[index];
               return ListTile(
                 title: Text(alert['message']),
-                subtitle: Text(
-                    'Location: ${alert['latitude']}, ${alert['longitude']}'),
+                subtitle: Text('Location: ${alert['latitude']}, ${alert['longitude']}'),
                 onTap: () => _showAlertDetails(context, alert),
               );
             },
