@@ -35,6 +35,10 @@ class _PanicScreenState extends State<PanicScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Panic Location'),
+        leading: IconButton(
+          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Column(
         children: [

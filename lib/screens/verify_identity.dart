@@ -51,7 +51,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
-              Text('Verification request submitted. Please wait for approval.'),
+          Text('Verification request submitted. Please wait for approval.'),
         ));
       }
     } catch (e) {
@@ -71,14 +71,19 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Verify Identity'),
+        leading: IconButton(
+          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Align(
+        alignment: Alignment(0, -0.5), // Adjust vertical alignment here
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             _idImage != null
-                ? Image.file(_idImage!)
-                : Icon(Icons.image, size: 100, color: Colors.grey),
+                ? Image.file(_idImage!, width: 100, height: 100)
+                : Image.asset('assets/upload_icon.png', width: 100, height: 100), // Custom upload icon
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _pickImage,

@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   NotificationService notificationService = NotificationService();
   String _currentMode = "Off"; // To display the current mode on the screen
   final LatLng _initialPosition =
-      const LatLng(37.7749, -122.4194); // Default to San Francisco
+  const LatLng(37.7749, -122.4194); // Default to San Francisco
 
   @override
   void initState() {
@@ -171,7 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 24, // Adjust size as necessary
           width: 24,
         ),
-        label: Text('Panic'), // Button label
+        label: Text(
+          'Panic',
+          style: TextStyle(color: Colors.white), // Set text color to white
+        ), // Button label
       ),
     );
   }

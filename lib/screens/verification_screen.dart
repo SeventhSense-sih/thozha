@@ -5,14 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 
 class AdminVerificationScreen extends StatelessWidget {
   final CollectionReference verificationsCollection =
-      FirebaseFirestore.instance.collection('verifications');
+  FirebaseFirestore.instance.collection('verifications');
 
   final FirebaseAuth _auth = FirebaseAuth.instance; // Initialize FirebaseAuth
 
   // Function to fetch user details
   Future<Map<String, dynamic>> _getUserDetails(String userId) async {
     DocumentSnapshot userDoc =
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    await FirebaseFirestore.instance.collection('users').doc(userId).get();
     if (userDoc.exists) {
       return userDoc.data() as Map<String, dynamic>;
     }
@@ -139,6 +139,10 @@ class AdminVerificationScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Admin Verification'),
+        leading: IconButton(
+          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: verificationsCollection
@@ -171,7 +175,7 @@ class AdminVerificationScreen extends StatelessWidget {
                 ),
                 subtitle: Text('Status: ${verification['status']}'),
                 trailing: IconButton(
-                  icon: Icon(Icons.info_outline),
+                  icon: Image.asset('assets/eye_icon.png'), // Custom eye icon
                   onPressed: () =>
                       _showUserDetailsDialog(context, verification.id),
                 ),

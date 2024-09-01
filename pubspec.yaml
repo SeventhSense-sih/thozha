@@ -15,7 +15,7 @@ dependencies:
   provider: ^6.0.5
   flutter_local_notifications: ^17.2.2
   google_sign_in: ^6.2.1
-  flutter_blue: 0.8.0
+
   speech_to_text: ^6.6.0
   firebase_messaging: 15.1.0
   firebase_messaging_web: 3.8.13
@@ -56,3 +56,5 @@ flutter:
     - assets/notification.png
     - assets/settings.png
     - assets/upload_icon.png
+    - assets/tick_icon.png
+    - assets/eye_icon.png

@@ -4,19 +4,28 @@ import 'package:thozha/screens/panic_screen.dart';
 
 class NotificationsScreen extends StatelessWidget {
   final CollectionReference alertsCollection =
-      FirebaseFirestore.instance.collection('alerts');
+  FirebaseFirestore.instance.collection('alerts');
 
   void _showAlertDetails(BuildContext context, DocumentSnapshot alert) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Alert Details'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          title: Text(
+            'Alert Details',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
+            textAlign: TextAlign.center,
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Display profile picture if available
                 if (alert['userProfilePic'] != null) ...[
                   CircleAvatar(
                     backgroundImage: NetworkImage(alert['userProfilePic']),
@@ -24,17 +33,17 @@ class NotificationsScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                 ],
-                Text('Name: ${alert['userName']}'),
-                Text('Age: ${alert['userAge']}'),
-                Text('Gender: ${alert['userGender']}'),
-                Text('Phone: ${alert['userPhone']}'),
+                _buildDetailRow('Name', alert['userName']),
+                _buildDetailRow('Age', alert['userAge']),
+                _buildDetailRow('Gender', alert['userGender']),
+                _buildDetailRow('Phone', alert['userPhone']),
                 SizedBox(height: 10),
-                Text('Message: ${alert['message']}'),
-                Text('Latitude: ${alert['latitude']}'),
-                Text('Longitude: ${alert['longitude']}'),
+                _buildDetailRow('Message', alert['message']),
+                _buildDetailRow('Latitude', alert['latitude']),
+                _buildDetailRow('Longitude', alert['longitude']),
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate to the PanicScreen and pass the coordinates
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => PanicScreen(
@@ -45,6 +54,13 @@ class NotificationsScreen extends StatelessWidget {
                     );
                   },
                   child: Text('Track Location'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.pinkAccent, // Corrected background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -60,6 +76,29 @@ class NotificationsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDetailRow(String label, dynamic value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Text(
+              '$value',
+              style: TextStyle(color: Colors.black),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +111,7 @@ class NotificationsScreen extends StatelessWidget {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:
-            alertsCollection.orderBy('timestamp', descending: true).snapshots(),
+        alertsCollection.orderBy('timestamp', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));

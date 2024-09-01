@@ -37,7 +37,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             .doc(user.uid)
             .get();
         if (userDoc.exists) {
-          // Update each field separately to ensure proper state update
           setState(() {
             _nameController.text = userDoc['name'] ?? '';
             _phoneController.text = userDoc['phone'] ?? '';
@@ -135,8 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
                         : (_profileImageUrl != null
-                            ? NetworkImage(_profileImageUrl!)
-                            : AssetImage('assets/upload_icon.png')),
+                        ? NetworkImage(_profileImageUrl!)
+                        : AssetImage('assets/upload_icon.png')),
                     child: _profileImage == null && _profileImageUrl == null
                         ? Icon(Icons.camera_alt, size: 50)
                         : null,
@@ -144,15 +143,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              // Show verification status and blue tick
+              // Show verification status and custom tick icon
               _isVerified
                   ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Verified User'),
-                        Icon(Icons.check_circle, color: Colors.blue),
-                      ],
-                    )
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Verified User'),
+                  Image.asset('assets/tick_icon.png', width: 21, height: 21),
+                ],
+              )
                   : Text('Verification Status: $_verificationStatus'),
               SizedBox(height: 20),
               TextFormField(
@@ -160,8 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Name',
                   filled: true,
-                  fillColor:
-                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -178,8 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
                   filled: true,
-                  fillColor:
-                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -197,8 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Age',
                   filled: true,
-                  fillColor:
-                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -213,8 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: _gender,
-                icon: Image.asset(
-                    'assets/dropdown_icon.png'), // Custom dropdown icon
+                icon: Image.asset('assets/dropdown_icon.png'), // Custom dropdown icon
                 items: ['Male', 'Female'].map((gender) {
                   return DropdownMenuItem<String>(
                     value: gender,
@@ -229,8 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Gender',
                   filled: true,
-                  fillColor:
-                      Colors.white.withOpacity(0.8), // Translucent white fill
+                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
