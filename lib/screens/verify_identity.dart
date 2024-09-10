@@ -70,30 +70,103 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Verify Identity'),
+        title: Text(
+          'Verify Identity',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.blueAccent,
         leading: IconButton(
-          icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
+          icon: Icon(Icons.arrow_back, color: Colors.white), // Official back arrow icon
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Align(
-        alignment: Alignment(0, -0.5), // Adjust vertical alignment here
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Profile Image or Upload Icon
             _idImage != null
-                ? Image.file(_idImage!, width: 100, height: 100)
-                : Image.asset('assets/upload_icon.png', width: 100, height: 100), // Custom upload icon
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: Text('Upload ID Proof'),
+                ? Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  _idImage!,
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+                : Column(
+              children: [
+                Image.asset(
+                  'assets/upload_icon.png',
+                  width: 100,
+                  height: 100,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Upload your ID Proof',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            if (_isUploading) CircularProgressIndicator(),
+            SizedBox(height: 30),
+
+            // Upload Button
+            ElevatedButton.icon(
+              onPressed: _pickImage,
+              icon: Icon(Icons.upload_file),
+              label: Text('Upload ID Proof'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                backgroundColor: Colors.blueAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            SizedBox(height: 30),
+
+            // Circular Progress Indicator for Uploading
+            if (_isUploading) ...[
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+            ],
+
+            // Submit for Verification Button
             ElevatedButton(
               onPressed: _submitVerification,
-              child: Text('Submit for Verification'),
+              child: Text(
+                'Submit for Verification',
+                style: TextStyle(fontSize: 16),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         ),

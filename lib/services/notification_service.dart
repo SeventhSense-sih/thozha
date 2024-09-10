@@ -2,23 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:thozha/screens/notification_screen.dart'; // Import the NotificationsScreen
 import 'package:flutter/material.dart';
+import 'package:thozha/screens/notification_screen.dart';
+import '../main.dart'; // Assuming this contains your `navigatorKey` and app initialization
 
-import '../main.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final CollectionReference alertsCollection =
-      FirebaseFirestore.instance.collection('alerts');
+  FirebaseFirestore.instance.collection('alerts');
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    InitializationSettings(android: initializationSettingsAndroid);
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -99,7 +99,7 @@ class NotificationService {
         'userGender': userDetails['gender'],
         'userPhone': userDetails['phone'],
         'userProfilePic': userDetails[
-            'profilePicture'], // Assuming this field stores the URL of the profile picture
+        'profilePicture'], // Assuming this field stores the URL of the profile picture
       });
 
       print('Alert saved to Firestore with user details.');
@@ -110,7 +110,7 @@ class NotificationService {
 
   void _showLocalNotification(String? title, String? body) {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    AndroidNotificationDetails(
       'high_alerts_channel', // channel ID
       'High Alerts', // channel name
       importance: Importance.high,
@@ -118,15 +118,85 @@ class NotificationService {
       showWhen: false,
     );
     const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    NotificationDetails(android: androidPlatformChannelSpecifics);
 
     flutterLocalNotificationsPlugin.show(
       0, // notification ID
       title,
       body,
       platformChannelSpecifics,
-      payload:
-          'navigateToNotificationsScreen', // Use payload to indicate navigation
+      payload: 'navigateToNotificationsScreen', // Use payload to indicate navigation
     );
+  }
+}
+
+class NotificationsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Notifications')),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('alerts').snapshots(), // Change from 'notifications' to 'alerts'
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var notification = snapshot.data!.docs[index];
+              return ListTile(
+                title: Text(notification['message']), // Title is the alert message
+                subtitle: Text(notification['timestamp']
+                    .toDate()
+                    .toString()), // You can format timestamp if needed
+                onTap: () {
+                  // Open details or Google Maps based on notification
+                  _openNotificationDialog(context, notification);
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _openNotificationDialog(BuildContext context, DocumentSnapshot notification) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(notification['message']),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Location: ${notification['latitude']}, ${notification['longitude']}'),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  _openGoogleMaps(notification['latitude'], notification['longitude']);
+                },
+                child: Text('Open Google Maps'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openGoogleMaps(double latitude, double longitude) {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    // Use url_launcher to open the Google Maps URL
+    // You need to include url_launcher package in pubspec.yaml
   }
 }

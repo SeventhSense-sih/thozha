@@ -34,13 +34,13 @@ class _LoginScreenState extends State<LoginScreen> {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
         final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
+        await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
         UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
         _checkUserDetails(userCredential.user);
       }
     } catch (e) {
@@ -95,96 +95,129 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(
+        title: Text('Login'),
+        backgroundColor: Colors.transparent,
+        elevation: 0, // Makes the app bar blend into the background
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image:
-                AssetImage('assets/background_image.jpg'), // Background image
+            image: AssetImage('assets/background_image.jpg'),
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.4), // Dark overlay for readability
+              BlendMode.darken,
+            ),
           ),
         ),
         child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Text(
+                  'Welcome Back',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 30),
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
+                    labelStyle: TextStyle(color: Colors.white),
                     filled: true,
-                    fillColor:
-                        Colors.white.withOpacity(0.8), // Translucent white fill
+                    fillColor: Colors.white.withOpacity(0.8),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 TextField(
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    labelStyle: TextStyle(color: Colors.white),
                     filled: true,
-                    fillColor:
-                        Colors.white.withOpacity(0.8), // Translucent white fill
+                    fillColor: Colors.white.withOpacity(0.8),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: _signInWithEmailPassword,
                   child: Text('Login with Email'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent, // Button color
+                    backgroundColor: Colors.blueAccent,
                     padding: EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: _signInWithGoogle,
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.redAccent, // Google button color
+                    backgroundColor: Colors.redAccent,
                     padding: EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/google_logo.png',
-                          height: 24.0), // Google logo
+                      Image.asset('assets/google_logo.png', height: 24),
                       SizedBox(width: 10),
-                      Text('Login with Google'),
+                      Text(
+                        'Login with Google',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SignupScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => SignupScreen()),
+                    );
                   },
-                  child: Text('Don\'t have an account? Sign up'),
-                  style: TextButton.styleFrom(
-                      foregroundColor: Colors.black), // Text button style
+                  child: Text(
+                    'Don\'t have an account? Sign up',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
                 TextButton(
                   onPressed: _resetPassword,
-                  child: Text('Forgot Password?'),
-                  style: TextButton.styleFrom(
-                      foregroundColor: Colors.black), // Text button style
+                  child: Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
               ],
             ),
