@@ -13,7 +13,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
 
   // Function to sign up with email and password
   Future<void> _signUpWithEmailPassword() async {
@@ -61,79 +61,119 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Sign Up')),
+      appBar: AppBar(
+        title: Text('Sign Up'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      extendBodyBehindAppBar: true,
       body: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           image: DecorationImage(
-            image:
-                AssetImage('assets/background_image.jpg'), // Background image
+            image: AssetImage('assets/background_image.jpg'), // Background image
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.5), // Dark overlay for readability
+              BlendMode.darken,
+            ),
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                filled: true,
-                fillColor:
-                    Colors.white.withOpacity(0.8), // Translucent white fill
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Title
+                Text(
+                  'Create Account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                SizedBox(height: 30),
+                // Email Text Field
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9), // Translucent white fill
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16), // Adjust padding
+                  ),
+                ),
+                SizedBox(height: 15),
+                // Password Text Field
+                TextField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16), // Adjust padding
+                  ),
+                  obscureText: true,
+                ),
+                SizedBox(height: 15),
+                // Confirm Password Text Field
+                TextField(
+                  controller: _confirmPasswordController,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16), // Adjust padding
+                  ),
+                  obscureText: true,
+                ),
+                SizedBox(height: 25),
+                // Sign Up Button
+                ElevatedButton(
+                  onPressed: _signUpWithEmailPassword,
+                  child: Text('Sign Up', style: TextStyle(fontSize: 18)),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blueAccent,
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                  ),
+                ),
+                SizedBox(height: 10),
+                // Already have an account? Login button
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
+                  },
+                  child: Text(
+                    'Already have an account? Login',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  style: TextButton.styleFrom(padding: EdgeInsets.all(10)),
+                ),
+              ],
             ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                filled: true,
-                fillColor:
-                    Colors.white.withOpacity(0.8), // Translucent white fill
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              obscureText: true,
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _confirmPasswordController,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                filled: true,
-                fillColor:
-                    Colors.white.withOpacity(0.8), // Translucent white fill
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _signUpWithEmailPassword, // Trigger sign-up process
-              child: Text('Sign Up'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blueAccent, // Button color
-                padding: EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-              child: Text('Already have an account? Login'),
-              style: TextButton.styleFrom(
-                  foregroundColor: Colors.black), // Text button style
-            ),
-          ],
+          ),
         ),
       ),
     );

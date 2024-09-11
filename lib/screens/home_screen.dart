@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thozha/services/voice_recognition_service.dart';
-import 'package:thozha/services/notification_service.dart';
+import 'package:thozha/services/notification_service.dart' as notifService; // Use a prefix
 import 'package:thozha/screens/settings_screen.dart';
-import 'package:thozha/screens/notification_screen.dart';
+import 'package:thozha/screens/notification_screen.dart' as notifScreen; // Use a prefix
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -16,10 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Location _location = Location();
   LocationData? _currentLocation;
   VoiceRecognitionService voiceService = VoiceRecognitionService();
-  NotificationService notificationService = NotificationService();
+  notifService.NotificationService notificationService = notifService.NotificationService();
   String _currentMode = "Off"; // To display the current mode on the screen
-  final LatLng _initialPosition =
-  const LatLng(37.7749, -122.4194); // Default to San Francisco
+  final LatLng _initialPosition = const LatLng(37.7749, -122.4194); // Default to San Francisco
 
   @override
   void initState() {
@@ -32,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
-    // Check if location service is enabled
     _serviceEnabled = await _location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await _location.requestService();
@@ -41,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    // Check for location permissions
     _permissionGranted = await _location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await _location.requestPermission();
@@ -50,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    // Fetch the current location
     try {
       _currentLocation = await _location.getLocation();
       setState(() {
@@ -69,12 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _mapController = controller;
   }
 
-  // Function to handle panic button press
   void _activatePanicMode() {
     setState(() {
-      _currentMode = "High"; // Switch to High Mode
+      _currentMode = "High";
     });
-    // Perform actions for high mode
     notificationService.sendAlert(
       "High Alert: Immediate assistance needed!",
       _currentLocation?.latitude,
@@ -82,22 +76,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Function to handle mode changes from settings
   void _changeMode(String mode) {
     setState(() {
-      _currentMode = mode; // Update the mode
+      _currentMode = mode;
     });
 
     if (_currentMode == "Low") {
-      // Start listening for voice commands in Low mode
       voiceService.startListening((keyword) {
         if (keyword == "danger") {
-          // If the code word is detected, switch to High mode
           _activatePanicMode();
         }
       });
     } else {
-      // Stop listening if not in Low mode
       voiceService.stopListening();
     }
   }
@@ -106,22 +96,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thozha - Home'),
-        backgroundColor: Color(0xFFFDE8E8), // More light pink background color
+        title: Text('Thozha - Home', style: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+        backgroundColor: Color(0xFFB71C1C), // Rich dark red for the app bar
         actions: [
           IconButton(
-            icon: Image.asset('assets/notification.png'), // Notification image
+            icon: Icon(Icons.notifications, color: Colors.white, size: 30),
             onPressed: () {
-              // Navigate to the notifications screen
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => NotificationsScreen()),
+                MaterialPageRoute(builder: (context) => notifScreen.NotificationsScreen()), // Use prefix for notification screen
               );
             },
           ),
           IconButton(
-            icon: Image.asset('assets/settings.png'), // Settings image
+            icon: Icon(Icons.settings, color: Colors.white, size: 30),
             onPressed: () {
-              // Navigate to the settings screen with current mode and callback
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => SettingsScreen(
@@ -143,20 +131,34 @@ class _HomeScreenState extends State<HomeScreen> {
               zoom: 10.0,
             ),
             myLocationEnabled: true,
-            myLocationButtonEnabled: true,
+            myLocationButtonEnabled: false, // Hides default button for cleaner UI
           ),
           Positioned(
             top: 20,
             left: 20,
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(10),
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade600,
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                    offset: Offset(4, 4),
+                  ),
+                ],
               ),
-              child: Text(
-                'Current Mode: $_currentMode',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Row(
+                children: [
+                  Icon(Icons.warning, color: Colors.yellowAccent, size: 24),
+                  SizedBox(width: 8),
+                  Text(
+                    'Current Mode: $_currentMode',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ],
               ),
             ),
           ),
@@ -165,16 +167,16 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _activatePanicMode,
-        backgroundColor: Colors.red, // Panic button color
-        icon: Image.asset(
-          'assets/alert_icon.png', // Path to your custom alert icon
-          height: 24, // Adjust size as necessary
-          width: 24,
-        ),
+        backgroundColor: Colors.redAccent, // Red for panic button
+        icon: Icon(Icons.error_outline, color: Colors.white, size: 28),
         label: Text(
           'Panic',
-          style: TextStyle(color: Colors.white), // Set text color to white
-        ), // Button label
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ),
     );
   }

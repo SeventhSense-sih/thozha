@@ -68,7 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await FirebaseAuth.instance.signOut();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => LoginScreen()),
-          (Route<dynamic> route) => false,
+              (Route<dynamic> route) => false,
         );
       } catch (e) {
         print('Logout failed: $e');
@@ -91,13 +91,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
-        backgroundColor: Colors.white, // Consistent color scheme
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Image.asset(
-              'assets/back_arrow.png'), // Using a custom image for the back button
+          icon: Image.asset('assets/back_arrow.png'),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        elevation: 2.0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -116,20 +122,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: Colors.pinkAccent.shade100,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 4,
               ),
             ),
             SizedBox(height: 20),
 
             // Toggle for Monitoring Mode
             Card(
-              elevation: 2,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: SwitchListTile(
-                title: Text('Monitoring'),
-                subtitle: Text(widget.currentMode == "High"
-                    ? 'High Mode'
-                    : (isMonitoringOn ? 'On (Low Mode)' : 'Off')),
+                title: Text(
+                  'Monitoring',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  widget.currentMode == "High"
+                      ? 'High Mode'
+                      : (isMonitoringOn ? 'On (Low Mode)' : 'Off'),
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
                 value: isMonitoringOn,
                 onChanged: _toggleMonitoring,
                 activeColor: Colors.green,
@@ -151,8 +167,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: Colors.pinkAccent.shade100,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 4,
               ),
             ),
             SizedBox(height: 20),
@@ -168,11 +185,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Verify Identity'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.green.shade600,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 4,
               ),
             ),
             SizedBox(height: 20),
@@ -186,8 +204,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: Colors.redAccent,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 4,
               ),
             ),
             SizedBox(height: 20),
@@ -198,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 future: checkIfAdmin(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasData && snapshot.data == true) {
                     return ElevatedButton(
@@ -215,8 +234,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         backgroundColor: Colors.orange,
                         padding: EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 4,
                       ),
                     );
                   }

@@ -68,14 +68,48 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/app_logo.png'), // Use your logo image file here
-            SizedBox(height: 20),
-            CircularProgressIndicator(), // Loading animation
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // App Logo with padding and scaling for better visual appeal
+              Image.asset(
+                'assets/app_logo.png', // Use your logo image file here
+                height: 120, // Adjust the size of the logo
+              ),
+              SizedBox(height: 30), // Spacing between logo and progress indicator
+              Text(
+                "Welcome to Our App",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              SizedBox(height: 30), // Add space between text and progress indicator
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ), // Loading animation with white color
+              SizedBox(height: 20),
+              Text(
+                "Preparing your experience...",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                  letterSpacing: 1.0,
+                ),
+              ), // Subtle loading message
+            ],
+          ),
         ),
       ),
     );

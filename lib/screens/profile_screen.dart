@@ -125,20 +125,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           key: _formKey,
           child: ListView(
             children: <Widget>[
-              // Display profile picture
+              // Display profile picture with a border and shadow
               Center(
                 child: GestureDetector(
                   onTap: _pickImage,
                   child: CircleAvatar(
-                    radius: 50,
+                    radius: 60,
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
                         : (_profileImageUrl != null
                         ? NetworkImage(_profileImageUrl!)
                         : AssetImage('assets/upload_icon.png')),
                     child: _profileImage == null && _profileImageUrl == null
-                        ? Icon(Icons.camera_alt, size: 50)
+                        ? Icon(Icons.camera_alt, size: 50, color: Colors.white)
                         : null,
+                    backgroundColor: Colors.grey[300], // Subtle background color
                   ),
                 ),
               ),
@@ -148,68 +149,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Verified User'),
-                  Image.asset('assets/tick_icon.png', width: 21, height: 21),
+                  Text(
+                    'Verified User',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.green),
+                  ),
+                  SizedBox(width: 8),
+                  Image.asset('assets/tick_icon.png', width: 24, height: 24),
                 ],
               )
-                  : Text('Verification Status: $_verificationStatus'),
+                  : Text(
+                'Verification Status: $_verificationStatus',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.redAccent),
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 20),
-              TextFormField(
+              // Name TextFormField with padding and custom styling
+              _buildCustomTextField(
                 controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
+                labelText: 'Name',
+                validatorText: 'Please enter your name',
               ),
               SizedBox(height: 10),
-              TextFormField(
+              _buildCustomTextField(
                 controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
+                labelText: 'Phone Number',
                 keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
+                validatorText: 'Please enter your phone number',
               ),
               SizedBox(height: 10),
-              TextFormField(
+              _buildCustomTextField(
                 controller: _ageController,
-                decoration: InputDecoration(
-                  labelText: 'Age',
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                ),
+                labelText: 'Age',
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  return null;
-                },
+                validatorText: 'Please enter your age',
               ),
               SizedBox(height: 10),
+              // Gender Dropdown with consistent style
               DropdownButtonFormField<String>(
                 value: _gender,
-                icon: Image.asset('assets/dropdown_icon.png'), // Custom dropdown icon
+                icon: Image.asset('assets/dropdown_icon.png'),
                 items: ['Male', 'Female'].map((gender) {
                   return DropdownMenuItem<String>(
                     value: gender,
@@ -224,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 decoration: InputDecoration(
                   labelText: 'Gender',
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.8), // Translucent white fill
+                  fillColor: Colors.white.withOpacity(0.8),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
@@ -235,6 +217,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 10),
+              // Switch List Tile for physically challenged status
               SwitchListTile(
                 title: Text('Physically Challenged'),
                 value: _physicallyChallenged,
@@ -245,6 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               SizedBox(height: 20),
+              // Update Profile Button
               ElevatedButton(
                 onPressed: _updateUserInfo,
                 child: Text('Update Profile'),
@@ -254,12 +239,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
+                  elevation: 5,
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCustomTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required String validatorText,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.8),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10)),
+      ),
+      keyboardType: keyboardType,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return validatorText;
+        }
+        return null;
+      },
     );
   }
 }

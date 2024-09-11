@@ -43,6 +43,7 @@ dev_dependencies:
 
 # Your assets and fonts configuration goes here
 flutter:
+  uses-material-design: true
   assets:
     - assets/google_logo.png
     - assets/background_img.png

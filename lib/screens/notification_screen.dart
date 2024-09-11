@@ -50,8 +50,8 @@ class NotificationsScreen extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => PanicScreen(
-                            victimLatitude: latitude, // Corrected parameter name
-                            victimLongitude: longitude, // Corrected parameter name
+                            victimLatitude: latitude,
+                            victimLongitude: longitude,
                           ),
                         ),
                       );
@@ -78,15 +78,19 @@ class NotificationsScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Close'),
+              child: Text(
+                'Close',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
       },
     );
   }
-
-
 
   Widget _buildDetailRow(String label, dynamic value) {
     return Padding(
@@ -96,12 +100,15 @@ class NotificationsScreen extends StatelessWidget {
         children: [
           Text(
             '$label: ',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           Expanded(
             child: Text(
               '$value',
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.black87, fontSize: 16),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -115,7 +122,11 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: Text(
+          'Notifications',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.blueAccent,
         leading: IconButton(
           icon: Image.asset('assets/back_arrow.png'),
           onPressed: () => Navigator.of(context).pop(),
@@ -135,10 +146,34 @@ class NotificationsScreen extends StatelessWidget {
             itemCount: notifications.length,
             itemBuilder: (context, index) {
               final alert = notifications[index];
-              return ListTile(
-                title: Text(alert['message']),
-                subtitle: Text('Location: ${alert['latitude']}, ${alert['longitude']}'),
-                onTap: () => _showAlertDetails(context, alert),
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  title: Text(
+                    alert['message'],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      'Location: ${alert['latitude']}, ${alert['longitude']}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ),
+                  trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                  onTap: () => _showAlertDetails(context, alert),
+                ),
               );
             },
           );

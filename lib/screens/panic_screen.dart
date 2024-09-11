@@ -57,40 +57,65 @@ class _PanicScreenState extends State<PanicScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Panic Location'),
+        backgroundColor: Colors.redAccent, // Color to indicate emergency
       ),
       body: Column(
         children: [
+          // Map Section with rounded corners
           Expanded(
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: LatLng(widget.victimLatitude, widget.victimLongitude),
-                zoom: 15.0,
-              ),
-              markers: {
-                // Marker for victim's location
-                Marker(
-                  markerId: MarkerId('panicLocation'),
-                  position: LatLng(widget.victimLatitude, widget.victimLongitude),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueRed),
-                ),
-                // Marker for current location if available
-                if (currentLocation != null)
-                  Marker(
-                    markerId: MarkerId('currentLocation'),
-                    position: LatLng(currentLocation!.latitude!, currentLocation!.longitude!),
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueBlue),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15), // Rounded corners for the map
+                child: GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(widget.victimLatitude, widget.victimLongitude),
+                    zoom: 15.0,
                   ),
-              },
+                  markers: {
+                    // Marker for victim's location
+                    Marker(
+                      markerId: MarkerId('panicLocation'),
+                      position: LatLng(widget.victimLatitude, widget.victimLongitude),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueRed),
+                    ),
+                    // Marker for current location if available
+                    if (currentLocation != null)
+                      Marker(
+                        markerId: MarkerId('currentLocation'),
+                        position: LatLng(currentLocation!.latitude!, currentLocation!.longitude!),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(
+                            BitmapDescriptor.hueBlue),
+                      ),
+                  },
+                ),
+              ),
             ),
           ),
+          // Button Section with padding and elevation
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
               onPressed: _launchMaps,
-              child: Text('Save the Victim'),
+              icon: Icon(Icons.directions, size: 24), // Icon to indicate navigation
+              label: Text(
+                'Save the Victim',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.redAccent, // Match emergency theme
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Rounded button for better design
+                ),
+                elevation: 5, // Adds shadow to the button
+              ),
             ),
           ),
         ],

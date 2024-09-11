@@ -23,14 +23,12 @@ class _ContactsScreenState extends State<ContactsScreen> {
         _relationController.text.isNotEmpty &&
         _phoneController.text.isNotEmpty) {
       if (id == null) {
-        // Adding a new contact
         contactsCollection.add({
           'name': _nameController.text,
           'relation': _relationController.text,
           'phoneNumber': _phoneController.text,
         });
       } else {
-        // Updating an existing contact
         contactsCollection.doc(id).update({
           'name': _nameController.text,
           'relation': _relationController.text,
@@ -60,21 +58,47 @@ class _ContactsScreenState extends State<ContactsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(id == null ? 'Add Contact' : 'Edit Contact'),
+        title: Text(
+          id == null ? 'Add Contact' : 'Edit Contact',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Contact Name'),
+              decoration: InputDecoration(
+                labelText: 'Contact Name',
+                filled: true,
+                fillColor: Colors.grey[200], // Light background for text field
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
+            SizedBox(height: 10),
             TextField(
               controller: _relationController,
-              decoration: InputDecoration(labelText: 'Relation'),
+              decoration: InputDecoration(
+                labelText: 'Relation',
+                filled: true,
+                fillColor: Colors.grey[200], // Light background for text field
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
+            SizedBox(height: 10),
             TextField(
               controller: _phoneController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                filled: true,
+                fillColor: Colors.grey[200], // Light background for text field
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               keyboardType: TextInputType.phone,
             ),
           ],
@@ -82,11 +106,14 @@ class _ContactsScreenState extends State<ContactsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: Colors.redAccent)),
           ),
           TextButton(
             onPressed: () => _addOrUpdateContact(id),
-            child: Text('Save'),
+            child: Text(
+              'Save',
+              style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -97,7 +124,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Emergency Contacts'),
+        title: Text(
+          'Emergency Contacts',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.blueAccent, // Applied color from design one
         leading: IconButton(
           icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
@@ -119,19 +149,33 @@ class _ContactsScreenState extends State<ContactsScreen> {
             itemBuilder: (context, index) {
               final contact = contacts[index];
               return Card(
-                elevation: 3,
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                elevation: 4,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: ListTile(
-                  title: Text(contact['name'],
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  title: Text(
+                    contact['name'],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                   subtitle: Text(
-                      '${contact['relation']} - ${contact['phoneNumber']}'),
+                    '${contact['relation']} - ${contact['phoneNumber']}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: Image.asset(
-                            'assets/edit_icon.png'), // Custom edit icon
+                          'assets/edit_icon.png',
+                          height: 24,
+                          width: 24,
+                        ), // Custom edit icon
                         onPressed: () => _showContactDialog(
                           contact.id,
                           contact['name'],
@@ -141,7 +185,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
                       ),
                       IconButton(
                         icon: Image.asset(
-                            'assets/delete_icon.png'), // Custom delete icon
+                          'assets/delete_icon.png',
+                          height: 24,
+                          width: 24,
+                        ), // Custom delete icon
                         onPressed: () => _deleteContact(contact.id),
                       ),
                     ],
@@ -154,8 +201,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showContactDialog(),
-        child: Image.asset('assets/add_icon.png'), // Custom add contact icon
+        child: Icon(Icons.add, size: 28, color: Colors.white), // Used Icon instead of Image
         backgroundColor: Colors.blueAccent, // Applied color from design one
+        elevation: 6,
       ),
     );
   }
