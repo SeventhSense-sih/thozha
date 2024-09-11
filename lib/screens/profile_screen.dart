@@ -235,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Text('Update Profile'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.blueAccent, // Button color
+                  backgroundColor: Colors.redAccent, // Button color
                   padding: EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),

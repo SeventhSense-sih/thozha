@@ -112,7 +112,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
             onPressed: () => _addOrUpdateContact(id),
             child: Text(
               'Save',
-              style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -128,7 +128,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           'Emergency Contacts',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blueAccent, // Applied color from design one
+        backgroundColor: Colors.redAccent, // Applied color from design one
         leading: IconButton(
           icon: Image.asset('assets/back_arrow.png'), // Custom back arrow icon
           onPressed: () => Navigator.of(context).pop(),
@@ -202,7 +202,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showContactDialog(),
         child: Icon(Icons.add, size: 28, color: Colors.white), // Used Icon instead of Image
-        backgroundColor: Colors.blueAccent, // Applied color from design one
+        backgroundColor: Colors.redAccent, // Applied color from design one
         elevation: 6,
       ),
     );

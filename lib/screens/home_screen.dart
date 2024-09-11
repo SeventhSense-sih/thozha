@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Thozha - Home', style: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: Color(0xFFB71C1C), // Rich dark red for the app bar
+        backgroundColor: Color(0xFFFF5252), // Rich dark red for the app bar
         actions: [
           IconButton(
             icon: Icon(Icons.notifications, color: Colors.white, size: 30),

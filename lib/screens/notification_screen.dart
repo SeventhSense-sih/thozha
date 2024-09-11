@@ -66,7 +66,7 @@ class NotificationsScreen extends StatelessWidget {
                   child: Text('Track Location'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.pinkAccent,
+                    backgroundColor: Colors.redAccent.shade200,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -126,7 +126,7 @@ class NotificationsScreen extends StatelessWidget {
           'Notifications',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.redAccent,
         leading: IconButton(
           icon: Image.asset('assets/back_arrow.png'),
           onPressed: () => Navigator.of(context).pop(),

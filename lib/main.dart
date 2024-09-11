@@ -7,7 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // Create an instance of FlutterLocalNotificationsPlugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -17,7 +17,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void _showLocalNotification(String? title, String? body) {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
+  AndroidNotificationDetails(
     'high_alerts_channel', // channel ID
     'High Alerts', // channel name
     importance: Importance.high,
@@ -25,7 +25,7 @@ void _showLocalNotification(String? title, String? body) {
     showWhen: false,
   );
   const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
+  NotificationDetails(android: androidPlatformChannelSpecifics);
 
   flutterLocalNotificationsPlugin.show(
     0, // notification ID
@@ -33,7 +33,7 @@ void _showLocalNotification(String? title, String? body) {
     body,
     platformChannelSpecifics,
     payload:
-        'navigateToNotificationsScreen', // Use payload to indicate navigation
+    'navigateToNotificationsScreen', // Use payload to indicate navigation
   );
 }
 
@@ -43,9 +43,9 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  AndroidInitializationSettings('@mipmap/ic_launcher');
   const InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+  InitializationSettings(android: initializationSettingsAndroid);
 
   await flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
@@ -65,11 +65,12 @@ void main() async {
 
 class ThozhaApp extends StatelessWidget {
   static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
+  GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,  // This removes the debug banner
       title: 'Thozha',
       theme: ThemeData(
         primarySwatch: Colors.blue,

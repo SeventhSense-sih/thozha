@@ -119,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('View/Edit Profile'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.pinkAccent.shade100,
+                backgroundColor: Colors.redAccent,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -164,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Manage Emergency Contacts'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.pinkAccent.shade100,
+                backgroundColor: Colors.redAccent,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -185,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Verify Identity'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.green.shade600,
+                backgroundColor: Colors.redAccent,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -231,7 +231,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Text('Admin Verification'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Colors.orange,
+                        backgroundColor: Colors.green,
                         padding: EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
