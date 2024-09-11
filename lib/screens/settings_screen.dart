@@ -28,14 +28,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     currentUser = FirebaseAuth.instance.currentUser;
   }
 
-  // Function to check if the current user is an admin
+  // Function to check if the current user is an admin from the 'admins' collection
   Future<bool> checkIfAdmin() async {
     if (currentUser != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
+      // Check if the user's UID exists in the 'admins' collection with the 'role' field as 'admin'
+      DocumentSnapshot adminDoc = await FirebaseFirestore.instance
+          .collection('admins')
           .doc(currentUser!.uid)
           .get();
-      return userDoc['isAdmin'] ?? false; // Default to false if not set
+
+      if (adminDoc.exists && adminDoc['role'] == 'admin') {
+        return true;
+      }
     }
     return false;
   }
@@ -201,7 +205,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (context) => AdminVerificationScreen()),
+                              builder: (context) =>
+                                  AdminVerificationScreen()), // Push the verification screen
                         );
                       },
                       child: Text('Admin Verification'),
